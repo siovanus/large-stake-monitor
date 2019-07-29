@@ -1,13 +1,16 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
+	"fmt"
 	"github.com/ontio/large-stake-monitor/config"
 	"github.com/ontio/large-stake-monitor/log"
 	sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/core/payload"
 	"github.com/ontio/ontology/smartcontract/service/native/governance"
 	"github.com/ontio/ontology/vm/neovm"
+	"os"
 )
 
 type SyncService struct {
@@ -84,5 +87,15 @@ func ParsePayload(code []byte) (*governance.AuthorizeForPeerParam, error) {
 }
 
 func Record(address, pubKey string, pos uint32) error {
-
+	f, err := os.Open("record")
+	if err != nil {
+		return fmt.Errorf("os.Create error: %s", err)
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	w.WriteString(fmt.Sprintf("Found large amount unauthorization, address:%s, node public key:%s, value:%d",
+		address, pubKey, pos))
+	w.WriteString("\n")
+	w.Flush()
+	return nil
 }

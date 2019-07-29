@@ -24,7 +24,6 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/ontio/large-stake-monitor/common"
 	"github.com/ontio/large-stake-monitor/config"
 	"github.com/ontio/large-stake-monitor/log"
 	"github.com/ontio/large-stake-monitor/service"
