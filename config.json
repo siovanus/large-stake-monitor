@@ -1,4 +1,4 @@
 {
   "JsonRpcAddress":"http://dappnode1.ont.io:20336",
-  "Limit":500000
+  "Limit":1
 }

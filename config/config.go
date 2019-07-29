@@ -37,7 +37,7 @@ var DefConfig = NewConfig()
 //Config object used by ontology-instance
 type Config struct {
 	JsonRpcAddress string
-	Limit          uint64
+	Limit          uint32
 }
 
 //NewConfig retuen a Config instance

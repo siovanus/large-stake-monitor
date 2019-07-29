@@ -55,7 +55,7 @@ func (this *SyncService) Monitor() {
 					log.Errorf("[Monitor] ParsePayload error:", err)
 				}
 				for index, pos := range param.PosList {
-					if pos > 500000 {
+					if pos > this.config.Limit {
 						err := Record(param.Address.ToBase58(), param.PeerPubkeyList[index], pos)
 						if err != nil {
 							log.Errorf("[Monitor] Record error:", err)
@@ -69,19 +69,25 @@ func (this *SyncService) Monitor() {
 }
 
 func ParsePayload(code []byte) (*governance.AuthorizeForPeerParam, error) {
-	executor := neovm.NewExecutor(code)
-	err := executor.Execute()
-	if err != nil {
-		return nil, err
-	}
-
-	paramBytes, err := executor.EvalStack.PopAsBytes()
-	if err != nil {
-		return nil, err
-	}
-
+	l := len(code)
 	param := new(governance.AuthorizeForPeerParam)
-	err = param.Deserialize(bytes.NewBuffer(paramBytes))
+	if l > 64 && string(code[l-22:]) == "Ontology.Native.Invoke" && string(code[l-46-18:l-46]) == "unAuthorizeForPeer" {
+		executor := neovm.NewExecutor(code)
+		err := executor.Execute()
+		if err != nil {
+			return nil, err
+		}
+
+		paramBytes, err := executor.EvalStack.PopAsBytes()
+		if err != nil {
+			return nil, err
+		}
+
+		err = param.Deserialize(bytes.NewBuffer(paramBytes))
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return param, nil
 }
