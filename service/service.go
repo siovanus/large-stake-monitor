@@ -50,7 +50,11 @@ func (this *SyncService) Monitor() {
 				log.Errorf("[Monitor] this.mainSdk.GetBlockByHeight error:", err)
 			}
 			for _, tx := range block.Transactions {
-				param, err := ParsePayload(tx.Payload.(*payload.InvokeCode).Code)
+				invokeCode, ok := tx.Payload.(*payload.InvokeCode)
+				if !ok {
+					continue
+				}
+				param, err := ParsePayload(invokeCode.Code)
 				if err != nil {
 					log.Errorf("[Monitor] ParsePayload error:", err)
 				}
@@ -93,15 +97,17 @@ func ParsePayload(code []byte) (*governance.AuthorizeForPeerParam, error) {
 }
 
 func Record(address, pubKey string, pos uint32) error {
-	f, err := os.Open("record")
+	f, err := os.OpenFile("record", os.O_RDWR, 0)
 	if err != nil {
-		return fmt.Errorf("os.Create error: %s", err)
+		return fmt.Errorf("os.OpenFile error: %s", err)
 	}
 	defer f.Close()
 	w := bufio.NewWriter(f)
-	w.WriteString(fmt.Sprintf("Found large amount unauthorization, address:%s, node public key:%s, value:%d",
-		address, pubKey, pos))
+	str := fmt.Sprintf("Found large amount unauthorization, address:%s, node public key:%s, value:%d",
+		address, pubKey, pos)
+	w.WriteString(str)
 	w.WriteString("\n")
 	w.Flush()
+	log.Infof("[Record] %s", str)
 	return nil
 }
