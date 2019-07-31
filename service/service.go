@@ -48,6 +48,7 @@ func (this *SyncService) Monitor() {
 			block, err := this.sdk.GetBlockByHeight(i)
 			if err != nil {
 				log.Errorf("[Monitor] this.mainSdk.GetBlockByHeight error:", err)
+				continue
 			}
 			for _, tx := range block.Transactions {
 				invokeCode, ok := tx.Payload.(*payload.InvokeCode)
