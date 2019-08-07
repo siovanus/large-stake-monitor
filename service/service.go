@@ -98,7 +98,7 @@ func ParsePayload(code []byte) (*governance.AuthorizeForPeerParam, error) {
 }
 
 func Record(address, pubKey string, pos uint32) error {
-	f, err := os.OpenFile("record", os.O_RDWR, 0)
+	f, err := os.OpenFile("record", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return fmt.Errorf("os.OpenFile error: %s", err)
 	}
